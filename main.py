@@ -1,58 +1,35 @@
 # Author: Benjamin Hilton
 # Date: May 2019
-# Copyright 2019 Benjamin Hilton
+# Stepper motor code used from:
+# https://learn.adafruit.com/adafruits-raspberry-pi-lesson-10-stepper-motors/software
 # Control for five-bar mechanism
 
 
 import numpy as np
 import math
+from gpiozero import Button # included with raspbian
+import board # included with raspbian
+import digitalio #from adafruit-blinka library, to install run "$ sudo pip3 install adafruit-blinka"
 
-# Declare distances for geometry:
-D_y = 20  # mm
-D_x = 26  # mm
-phiD_degrees = 25 #degrees
-phiD = np.radians(phiD_degrees)
-distBetweenActuators = 48 # mm
+# multiplication by this rotation matrix transforms the right side origin into the base origin
+T_d = np.array([[0.9063,-0.4226,26],[0.4226,0.9063,20],[0,0,1]])
+# multiplication by this rotation matrix transforms the base origin to the right side origin
+T_dINV = np.array([[0.9063,0.4226,-32.0164],[-0.4226,0.9063,-7.1381],[0,0,1]])
+# multiplication by this rotation matrix transfroms the left side origin into the base origin
+T_c = np.array([[0.9063,0.4226,-69.5028],[-0.4226,0.9063,40.2857],[0,0,1]])
+# multiplication by this rotation matrix transforms the base origin to the left side origin
+T_cINV = np.array([[0.9063,0.4226,-69.5028],[-0.4226,0.9063,40.2857],[0,0,1]])
 
-
-T_d = np.array([[np.cos(phiD),-np.sin(phiD), D_x], 
-                [np.sin(phiD), np.cos(phiD), D_y], 
-                [0,0,1]])
-
-# Calculate inverse of T_d
-Td_transpose = np.array([[np.cos(phiD),np.sin(phiD), 0], 
-                [-np.sin(phiD), np.cos(phiD), 0], 
-                [0,0,1]])
-
-Td_translate = np.array([[1,0,-D_x],[0,1,-D_y],[0,0,1]])
-T_dINV = np.dot(Td_transpose,Td_translate)
-
-# Calculate left side from symmetry
-phiC = phiD
-farPoint = T_d * np.array([[distBetweenActuators],[0],[1]])
-C_x = -farPoint(1)
-C_y = farPoint(2)
-
-T_c = np.array([[np.cos(-phiC),-np.sin(-phiC), C_x], 
-                [np.sin(-phiC), np.cos(-phiC), C_y], 
-                [0,0,1]])
-
-
-# Calculate inverse of T_c
-Tc_transpose = np.array([[np.cos(-phiC),np.sin(-phiC), 0], 
-                [-np.sin(-phiC), np.cos(-phiC), 0], 
-                [0,0,1]])
-
-Tc_translate = np.array([[1,0,-C_x],[0,1,-C_y],[0,0,1]])
-T_cINV = np.dot(Tc_transpose,Tc_translate)
+# Declare stepper motors
 
 
 
-# Arm Lengths:
-lengthA = 5 # mm
-lengthB = 5 # mm
-lengthC = 47 # mm
-lengthD = 64 # mm
+
+while True:
+    # zero stepper motors
+
+
+
 
 
 
