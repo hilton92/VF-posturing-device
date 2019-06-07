@@ -13,8 +13,7 @@ class Stepper:
         self.limitSwitchPin = limitSwitch
     
     def zero_stepper():
-        button = Button(self.limitSwitchPin)
-        while not button.is_pressed:
+        while not GPIO.input(self.limitSwitchPin):
             take_steps(-1)
         self.currentPosition = 0
         take_steps(20)

@@ -77,7 +77,11 @@ StepperD.zero_stepper()
 while True:
      val = input("Enter X and Y in the form X_Y (no spaces)")
      X, Y = val.split("_",1)
-    theta1, theta2 = transform(X,Y, )
+     Y_base = Y + 50
+     XLeft = -X
+     XRight = X
+    theta1Left, theta2Left = transform(XLeft,Y_base)
+    theta1Right, theta2Right = transform(XRight, Y_base)
 
 
 
