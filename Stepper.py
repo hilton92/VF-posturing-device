@@ -2,7 +2,7 @@
 # Date: May 2019
 
 import RPi.GPIO as GPIO
-from time import sleep
+import time
 
 class Stepper:
     def __init__(self, pul, dir, ena, steps, limitSwitch):
@@ -12,14 +12,14 @@ class Stepper:
         self.stepsFromZeroToStarting = steps
         self.limitSwitchPin = limitSwitch
     
-    def zero_stepper():
+    def zero_stepper(self):
         while not GPIO.input(self.limitSwitchPin):
-            take_steps(-1)
+            self.take_steps(-1)
         self.currentPosition = 0
-        take_steps(20)
+        self.take_steps(20)
 
 
-    def take_steps(steps):
+    def take_steps(self, steps):
         if steps > 0:
             for x in range(steps):
                 GPIO.output(self.DIRpin, 0)
@@ -27,7 +27,7 @@ class Stepper:
                 GPIO.output(self.PULpin, 1)
                 time.sleep(0.00005)
                 GPIO.output(self.PULpin, 0)
-                time.sleep(0.001)
+                time.sleep(0.005)
         
         elif steps < 0:
             steps = abs(steps)

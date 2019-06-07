@@ -1,88 +1,91 @@
 # Author: Benjamin Hilton
 # Date: May 2019
-# Stepper motor code used from:
-# https://learn.adafruit.com/adafruits-raspberry-pi-lesson-10-stepper-motors/software
 # Control for five-bar mechanism
 
 
 import numpy as np
 import math
 import RPi.GPIO as GPIO
-import Stepper
+from Stepper import Stepper
 
 
-# multiplication by this rotation matrix transforms the right side origin into the base origin
-T_d = np.array([[0.9063,-0.4226,26],[0.4226,0.9063,20],[0,0,1]])
-# multiplication by this rotation matrix transforms the base origin to the right side origin
-T_dINV = np.array([[0.9063,0.4226,-32.0164],[-0.4226,0.9063,-7.1381],[0,0,1]])
-# multiplication by this rotation matrix transfroms the left side origin into the base origin
-T_c = np.array([[0.9063,0.4226,-69.5028],[-0.4226,0.9063,40.2857],[0,0,1]])
-# multiplication by this rotation matrix transforms the base origin to the left side origin
-T_cINV = np.array([[0.9063,0.4226,-69.5028],[-0.4226,0.9063,40.2857],[0,0,1]])
+if __name__ == "__main__":
 
-GPIO.setmode(GPIO.BOARD)
+    # multiplication by this rotation matrix transforms the right side origin into the base origin
+    T_d = np.array([[0.9063,-0.4226,26],[0.4226,0.9063,20],[0,0,1]])
+    # multiplication by this rotation matrix transforms the base origin to the right side origin
+    T_dINV = np.array([[0.9063,0.4226,-32.0164],[-0.4226,0.9063,-7.1381],[0,0,1]])
+    # multiplication by this rotation matrix transfroms the left side origin into the base origin
+    T_c = np.array([[0.9063,0.4226,-69.5028],[-0.4226,0.9063,40.2857],[0,0,1]])
+    # multiplication by this rotation matrix transforms the base origin to the left side origin
+    T_cINV = np.array([[0.9063,0.4226,-69.5028],[-0.4226,0.9063,40.2857],[0,0,1]])
 
-# Declare stepper motors
-StepperA_PUL = 47
-StepperA_DIR = 49
-StepperA_ENA = 51
-StepperB_PUL = 46
-StepperB_DIR = 48
-StepperB_ENA = 50
-StepperC_PUL = 39
-StepperC_DIR = 41
-StepperC_ENA = 43
-StepperD_PUL = 38
-StepperD_DIR = 40
-StepperD_ENA = 42
+    GPIO.setmode(GPIO.BOARD) # this means the numbers for buttons are specified by the board numbers (as opposed to processor numbers)
 
-LimitA_signal = 29
-LimitB_signal = 27
-LimitC_signal = 25
-LimitD_signal = 23
+    # Declare stepper motors
+    StepperA_PUL = 7
+    StepperA_DIR = 5
+    StepperA_ENA = 3
+    StepperB_PUL = 11
+    StepperB_DIR = 13
+    StepperB_ENA = 15
+    StepperC_PUL = 26
+    StepperC_DIR = 24
+    StepperC_ENA = 22
+    StepperD_PUL = 40
+    StepperD_DIR = 38
+    StepperD_ENA = 36
 
-GPIO.setup(StepperA_PUL, GPIO.OUT)
-GPIO.setup(StepperA_DIR, GPIO.OUT)
-GPIO.setup(StepperA_ENA, GPIO.OUT)
-GPIO.setup(StepperB_PUL, GPIO.OUT)
-GPIO.setup(StepperB_DIR, GPIO.OUT)
-GPIO.setup(StepperB_ENA, GPIO.OUT)
-GPIO.setup(StepperC_PUL, GPIO.OUT)
-GPIO.setup(StepperC_DIR, GPIO.OUT)
-GPIO.setup(StepperC_ENA, GPIO.OUT)
-GPIO.setup(StepperD_PUL, GPIO.OUT)
-GPIO.setup(StepperD_DIR, GPIO.OUT)
-GPIO.setup(StepperD_ENA, GPIO.OUT)
+    LimitA_signal = 31
+    LimitB_signal = 33
+    LimitC_signal = 35
+    LimitD_signal = 37
 
-GPIO.setup(LimitA_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(LimitB_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(LimitC_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(LimitD_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-
-
-StepperA  = Stepper(StepperA_PUL, StepperA_DIR, StepperA_ENA, 488, LimitA_signal)
-StepperB  = Stepper(StepperB_PUL, StepperB_DIR, StepperB_ENA, 336, LimitB_signal)
-StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 512, LimitC_signal)
-StepperD  = Stepper(StepperD_PUL, StepperD_DIR, StepperD_ENA, 527, LimitD_signal)
-
-# Zero the Stepper Motors
-
-StepperA.zero_stepper()
-StepperB.zero_stepper()
-StepperC.zero_stepper()
-StepperD.zero_stepper()
+    # Define all stepper control GPIO as output
+    GPIO.setup(StepperA_PUL, GPIO.OUT)
+    GPIO.setup(StepperA_DIR, GPIO.OUT)
+    GPIO.setup(StepperA_ENA, GPIO.OUT)
+    GPIO.setup(StepperB_PUL, GPIO.OUT)
+    GPIO.setup(StepperB_DIR, GPIO.OUT)
+    GPIO.setup(StepperB_ENA, GPIO.OUT)
+    GPIO.setup(StepperC_PUL, GPIO.OUT)
+    GPIO.setup(StepperC_DIR, GPIO.OUT)
+    GPIO.setup(StepperC_ENA, GPIO.OUT)
+    GPIO.setup(StepperD_PUL, GPIO.OUT)
+    GPIO.setup(StepperD_DIR, GPIO.OUT)
+    GPIO.setup(StepperD_ENA, GPIO.OUT)
+    
+    
+    # Define all limit switch pins as inputs, enable built in pull down resistor
+    GPIO.setup(LimitA_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(LimitB_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(LimitC_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(LimitD_signal, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 
-while True:
-     val = input("Enter X and Y in the form X_Y (no spaces)")
-     X, Y = val.split("_",1)
-     Y_base = Y + 50
-     XLeft = -X
-     XRight = X
-    theta1Left, theta2Left = transform(XLeft,Y_base)
-    theta1Right, theta2Right = transform(XRight, Y_base)
+    # Define stepper objects
+    # Stepper(pulse pin, direction pin, enable pin, steps from limit switch to zero, limit switch pin)
+    StepperA  = Stepper(StepperA_PUL, StepperA_DIR, StepperA_ENA, 488, LimitA_signal)
+    StepperB  = Stepper(StepperB_PUL, StepperB_DIR, StepperB_ENA, 336, LimitB_signal)
+    StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 512, LimitC_signal)
+    StepperD  = Stepper(StepperD_PUL, StepperD_DIR, StepperD_ENA, 527, LimitD_signal)
 
+
+    # Zero the Stepper Motors
+    #StepperA.zero_stepper()
+    #StepperB.zero_stepper()
+    StepperC.zero_stepper()
+    #StepperD.zero_stepper()
+
+
+#while True:
+#    val = input("Enter X and Y in the form X_Y (no spaces)")
+#    X, Y = val.split("_",1)
+#    Y_base = Y + 50
+#   XLeft = -X
+#    XRight = X
+#    theta1Left, theta2Left = transform(XLeft,Y_base)
+#    theta1Right, theta2Right = transform(XRight, Y_base)
 
 
 
