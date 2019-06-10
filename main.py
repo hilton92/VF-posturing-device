@@ -67,24 +67,23 @@ if __name__ == "__main__":
 
 
         # Define stepper objects
-        # Stepper(pulse pin, direction pin, enable pin, steps from limit switch to zero, limit switch pin)
-        StepperA  = Stepper(StepperA_PUL, StepperA_DIR, StepperA_ENA, 1300, LimitA_signal, 1)
-        StepperB  = Stepper(StepperB_PUL, StepperB_DIR, StepperB_ENA, 1000, LimitB_signal, 1)
-        StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 1000, LimitC_signal, 0)
-        StepperD  = Stepper(StepperD_PUL, StepperD_DIR, StepperD_ENA, 1000, LimitD_signal, 0)
+        # Stepper(pulse pin, direction pin, enable pin, steps from limit switch to home, limit switch pin, direction, step limit, home (degrees))
+        StepperA  = Stepper(StepperA_PUL, StepperA_DIR, StepperA_ENA, 675, LimitA_signal, 1, 1300, 45)
+        StepperB  = Stepper(StepperB_PUL, StepperB_DIR, StepperB_ENA, 200, LimitB_signal, 1, 1300, 180)
+        StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 200, LimitC_signal, 0, 1300, 180)
+        StepperD  = Stepper(StepperD_PUL, StepperD_DIR, StepperD_ENA, 200, LimitD_signal, 0, 1300, 45)
 
 
         # Zero the Stepper Motors
         StepperA.zero_stepper()
-        StepperB.zero_stepper()
-        StepperC.zero_stepper()
-        StepperD.zero_stepper()
+        #StepperB.zero_stepper()
+        #StepperC.zero_stepper()
+        #StepperD.zero_stepper()
         
         
         #~ while True:
             #~ try:
-                #~ val = input("Enter X and Y in the form X,Y (no spaces)")
-                #~ otherStrign = "hello"
+                #~ val = input("Enter X and Y in the form X,Y")
                 #~ myString = str(val)
                 #~ [X, Y] = myString.split(",")
             #~ except KeyboardInterrupt:
@@ -95,15 +94,35 @@ if __name__ == "__main__":
             #~ Y_base = int(Y) + 65
             #~ XBaseRight = int(X)
             #~ Right = np.dot(T_dINV, np.array([[XBaseRight],[Y_base],[1]]))
+            
+            #~ print(Right[0])
+            #~ print(Right[1])
             #~ theta1Right, theta2Right = transform(Right[0], Right[1])
-            #~ stepsperdegree = 20
-            #~ stepsA = theta1Left*stepsperdegree
-            #~ stepsB = theta2Left*stepsperdegree
-            #~ stepsC = theta1Right*stepsperdegree
-            #~ stepsD = theta2Right * stepsperdegree
-            #~ #StepperA.take_steps(stepsA)
-            #~ #StepperB.take_steps(stepsB)
-        
+            #~ theta1 = ((theta1Right / 3.1416) * 180) + 25
+            #~ theta2 = ((theta2Right / 3.1416) * 180) + 25
+            
+            #~ print(theta1)
+            #~ print(theta2)
+    
+    
+            #~ stepsA = (theta2 - StepperA.get_theta()) * StepperA.stepsPerDegree
+            #~ stepsB = (theta1 - StepperB.get_theta()) * StepperB.stepsPerDegree
+            #~ stepsC = (theta1 - StepperC.get_theta()) * StepperC.stepsPerDegree
+            #~ stepsD = (theta2 - StepperD.get_theta()) * StepperD.stepsPerDegree  
+                      
+            #~ for i in range(20): # take steps each stepper 1/20th of the way
+                #~ StepperA.take_steps(int(stepsA / 20))
+                #~ StepperB.take_steps(int(stepsB / 20))
+                #~ StepperC.take_steps(int(stepsC / 20))
+                #~ StepperD.take_steps(int(stepsD / 20))
+                
+            #~ # make any remaining movement
+            #~ StepperA.take_steps(stepsA - StepperA.get_steps_from_theta_zero())
+            #~ StepperB.take_steps(stepsB - StepperB.get_steps_from_theta_zero())
+            #~ StepperC.take_steps(stepsC - StepperC.get_steps_from_theta_zero())
+            #~ StepperD.take_steps(stepsD - StepperD.get_steps_from_theta_zero())
+            #~ print("At X location " + str(X) + " and Y location " + str(Y))
+                    
         
         
     except KeyboardInterrupt:
@@ -112,6 +131,7 @@ if __name__ == "__main__":
         
     finally:
         GPIO.cleanup()
+        print("Cleaning up GPIO ports")
 
 
 
