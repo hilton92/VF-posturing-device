@@ -133,17 +133,17 @@ if __name__ == "__main__":
     
                       
             for i in range(factor): # take steps each stepper 1/20th of the way
-                StepperA.take_steps(steps_a, 0.00007)
-                StepperB.take_steps(steps_b, 0.00007)
-                StepperC.take_steps(steps_c, 0.00007)
-                StepperD.take_steps(steps_d, 0.00007)
+                StepperA.take_steps(steps_a, 0.0007)
+                StepperB.take_steps(steps_b, 0.0007)
+                StepperC.take_steps(steps_c, 0.0007)
+                StepperD.take_steps(steps_d, 0.0007)
                 
                 
             # make any remaining movement
-            StepperA.take_steps(remainder_a, 0.00007)
-            StepperB.take_steps(remainder_b, 0.00007)
-            StepperC.take_steps(remainder_c, 0.00007)
-            StepperD.take_steps(remainder_d, 0.00007)
+            StepperA.take_steps(remainder_a, 0.0007)
+            StepperB.take_steps(remainder_b, 0.0007)
+            StepperC.take_steps(remainder_c, 0.0007)
+            StepperD.take_steps(remainder_d, 0.0007)
             print("At X location " + str(X) + " and Y location " + str(Y))
                     
         
