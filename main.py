@@ -68,60 +68,83 @@ if __name__ == "__main__":
 
         # Define stepper objects
         # Stepper(pulse pin, direction pin, enable pin, steps from limit switch to home, limit switch pin, direction, step limit, home (degrees))
-        StepperA  = Stepper(StepperA_PUL, StepperA_DIR, StepperA_ENA, 675, LimitA_signal, 1, 1300, 45)
-        StepperB  = Stepper(StepperB_PUL, StepperB_DIR, StepperB_ENA, 200, LimitB_signal, 1, 1300, 180)
-        StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 200, LimitC_signal, 0, 1300, 180)
-        StepperD  = Stepper(StepperD_PUL, StepperD_DIR, StepperD_ENA, 200, LimitD_signal, 0, 1300, 45)
+        StepperA  = Stepper(StepperA_PUL, StepperA_DIR, StepperA_ENA, 450, LimitA_signal, 1, 1300, 45)
+        StepperB  = Stepper(StepperB_PUL, StepperB_DIR, StepperB_ENA, 400, LimitB_signal, 1, 1300, 180)
+        StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 350, LimitC_signal, 0, 1300, 180)
+        StepperD  = Stepper(StepperD_PUL, StepperD_DIR, StepperD_ENA, 450, LimitD_signal, 0, 1300, 45)
 
 
         # Zero the Stepper Motors
         StepperA.zero_stepper()
-        #StepperB.zero_stepper()
-        #StepperC.zero_stepper()
-        #StepperD.zero_stepper()
+        StepperB.zero_stepper()
+        StepperC.zero_stepper()
+        StepperD.zero_stepper()
         
         
-        #~ while True:
-            #~ try:
-                #~ val = input("Enter X and Y in the form X,Y")
-                #~ myString = str(val)
-                #~ [X, Y] = myString.split(",")
-            #~ except KeyboardInterrupt:
-                #~ break
-            #~ except:
-                #~ print("That wasn't right. Try again")
-                #~ continue
-            #~ Y_base = int(Y) + 65
-            #~ XBaseRight = int(X)
-            #~ Right = np.dot(T_dINV, np.array([[XBaseRight],[Y_base],[1]]))
+        #print(StepperA.get_theta())
+        #print(StepperB.get_theta())
+        #print(StepperC.get_theta())
+        #print(StepperD.get_theta())
+        
+        
+        while True:
+            try:
+                val = input("Enter X and Y in the form X,Y")
+                myString = str(val)
+                [X, Y] = myString.split(",")
+            except KeyboardInterrupt:
+                break
+            except:
+                print("That wasn't right. Try again")
+                continue
+            Y_base = float(Y) + 65
+            XBaseRight = float(X)
+            Right = np.dot(T_dINV, np.array([[XBaseRight],[Y_base],[1]]))
             
-            #~ print(Right[0])
-            #~ print(Right[1])
-            #~ theta1Right, theta2Right = transform(Right[0], Right[1])
-            #~ theta1 = ((theta1Right / 3.1416) * 180) + 25
-            #~ theta2 = ((theta2Right / 3.1416) * 180) + 25
+            #print(Right[0])
+            #print(Right[1])
+            theta1Right, theta2Right = transform(Right[0], Right[1])
+            theta1 = ((theta1Right / 3.1416) * 180) + 25
+            theta2 = ((theta2Right / 3.1416) * 180) + 25
             
-            #~ print(theta1)
-            #~ print(theta2)
+            print(theta1)
+            print(theta2)
     
     
-            #~ stepsA = (theta2 - StepperA.get_theta()) * StepperA.stepsPerDegree
-            #~ stepsB = (theta1 - StepperB.get_theta()) * StepperB.stepsPerDegree
-            #~ stepsC = (theta1 - StepperC.get_theta()) * StepperC.stepsPerDegree
-            #~ stepsD = (theta2 - StepperD.get_theta()) * StepperD.stepsPerDegree  
+            stepsA = math.floor((theta2 - StepperA.get_theta()) * StepperA.stepsPerDegree)
+            stepsB = math.floor((theta1 - StepperB.get_theta()) * StepperB.stepsPerDegree)
+            stepsC = math.floor((theta1 - StepperC.get_theta()) * StepperC.stepsPerDegree)
+            stepsD = math.floor((theta2 - StepperD.get_theta()) * StepperD.stepsPerDegree)  
+            
+            print(stepsA)
+            print(stepsB)
+            print(stepsC)
+            print(stepsD)
+            
+            factor = 20
+            steps_a = math.floor(stepsA / factor)
+            remainder_a = stepsA % factor
+            steps_b = math.floor(stepsB / factor)
+            remainder_b = stepsB % factor
+            steps_c = math.floor(stepsC / factor)
+            remainder_c = stepsC % factor
+            steps_d = math.floor(stepsD / factor)
+            remainder_d = stepsD % factor
+    
                       
-            #~ for i in range(20): # take steps each stepper 1/20th of the way
-                #~ StepperA.take_steps(int(stepsA / 20))
-                #~ StepperB.take_steps(int(stepsB / 20))
-                #~ StepperC.take_steps(int(stepsC / 20))
-                #~ StepperD.take_steps(int(stepsD / 20))
+            for i in range(factor): # take steps each stepper 1/20th of the way
+                StepperA.take_steps(steps_a, 0.00007)
+                StepperB.take_steps(steps_b, 0.00007)
+                StepperC.take_steps(steps_c, 0.00007)
+                StepperD.take_steps(steps_d, 0.00007)
                 
-            #~ # make any remaining movement
-            #~ StepperA.take_steps(stepsA - StepperA.get_steps_from_theta_zero())
-            #~ StepperB.take_steps(stepsB - StepperB.get_steps_from_theta_zero())
-            #~ StepperC.take_steps(stepsC - StepperC.get_steps_from_theta_zero())
-            #~ StepperD.take_steps(stepsD - StepperD.get_steps_from_theta_zero())
-            #~ print("At X location " + str(X) + " and Y location " + str(Y))
+                
+            # make any remaining movement
+            StepperA.take_steps(remainder_a, 0.00007)
+            StepperB.take_steps(remainder_b, 0.00007)
+            StepperC.take_steps(remainder_c, 0.00007)
+            StepperD.take_steps(remainder_d, 0.00007)
+            print("At X location " + str(X) + " and Y location " + str(Y))
                     
         
         

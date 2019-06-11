@@ -13,7 +13,7 @@ def transform(desiredX, desiredY):
     # Arm Lengths:
     lengthA = 5 # mm
     lengthB = 5 # mm
-    lengthC = 47 # mm
+    lengthC = 46.6 # mm
     lengthD = 64 # mm
     lengthE = 7 # mm
     
