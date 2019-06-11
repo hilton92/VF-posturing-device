@@ -1,6 +1,6 @@
 # Author: Benjamin Hilton
 # Date: May 2019
-# Control for five-bar mechanism
+# Control for posturing device (five-bar mechanism)
 
 
 import numpy as np
@@ -39,6 +39,7 @@ if __name__ == "__main__":
         StepperD_DIR = 38
         StepperD_ENA = 36
 
+        # Declare limit switches
         LimitA_signal = 31
         LimitB_signal = 33
         LimitC_signal = 35
@@ -95,32 +96,31 @@ if __name__ == "__main__":
             except KeyboardInterrupt:
                 break
             except:
-                print("That wasn't right. Try again")
+                print("That wasn't right. Try again.")
                 continue
             Y_base = float(Y) + 65
             XBaseRight = float(X)
+
+            # Transform points from base origin to right-side origin
             Right = np.dot(T_dINV, np.array([[XBaseRight],[Y_base],[1]]))
-            
-            #print(Right[0])
-            #print(Right[1])
+
+            # Calculate degrees of actuators for requested X and Y
             theta1Right, theta2Right = transform(Right[0], Right[1])
+
+            # Convert to degrees, add 25 (transform function returns theta in right-side origin, add 25 to get in base origin)
             theta1 = ((theta1Right / 3.1416) * 180) + 25
             theta2 = ((theta2Right / 3.1416) * 180) + 25
             
-            print(theta1)
-            print(theta2)
+            #print(theta1)
+            #print(theta2)
     
-    
+            # Calculate required steps for move
             stepsA = math.floor((theta2 - StepperA.get_theta()) * StepperA.stepsPerDegree)
             stepsB = math.floor((theta1 - StepperB.get_theta()) * StepperB.stepsPerDegree)
             stepsC = math.floor((theta1 - StepperC.get_theta()) * StepperC.stepsPerDegree)
             stepsD = math.floor((theta2 - StepperD.get_theta()) * StepperD.stepsPerDegree)  
             
-            print(stepsA)
-            print(stepsB)
-            print(stepsC)
-            print(stepsD)
-            
+            # Separate movement into [factor] separate movements
             factor = 20
             steps_a = math.floor(stepsA / factor)
             remainder_a = stepsA % factor
@@ -131,13 +131,14 @@ if __name__ == "__main__":
             steps_d = math.floor(stepsD / factor)
             remainder_d = stepsD % factor
     
-                      
-            for i in range(factor): # take steps each stepper 1/20th of the way
-                StepperA.take_steps(steps_a, 0.0007)
-                StepperB.take_steps(steps_b, 0.0007)
-                StepperC.take_steps(steps_c, 0.0007)
-                StepperD.take_steps(steps_d, 0.0007)
-                
+
+            # Take steps each stepper 1 /[factor] of the way          
+            for i in range(factor):
+                StepperA.take_steps(steps_a, 0.00007)
+                StepperB.take_steps(steps_b, 0.00007)
+                StepperC.take_steps(steps_c, 0.00007)
+                StepperD.take_steps(steps_d, 0.00007)
+
                 
             # make any remaining movement
             StepperA.take_steps(remainder_a, 0.0007)
@@ -149,10 +150,11 @@ if __name__ == "__main__":
         
         
     except KeyboardInterrupt:
-        # program was terminated
+        # Program was terminated by user (CTRL C)
         print("Program terminated by user")
         
     finally:
+        # Runs even if error occurs, cleanup resets all GPIO pins as inputs and frees them for other use
         GPIO.cleanup()
         print("Cleaning up GPIO ports")
 
