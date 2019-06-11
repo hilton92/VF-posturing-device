@@ -27,7 +27,6 @@ class Stepper:
             return self.currentPosition - self.stepsFromZeroToHome
     
     def zero_stepper(self):
-
         while not GPIO.input(self.limitSwitchPin):
                 self.take_steps(-1, 0.008)
         self.currentPosition = 0

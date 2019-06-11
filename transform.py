@@ -1,19 +1,18 @@
 # Author: Benjamin Hilton
 # Date: June 2019
+# Function to perform trig on five-bar mechanism
 
 import numpy as np
 import math
 
 
-# Function returns theta1 and theta2 in degrees
+# Function returns theta1 and theta2 in radians
 def transform(desiredX, desiredY):
 
-    #print(desiredX)
-    #print(desiredY)
     # Arm Lengths:
     lengthA = 5 # mm
     lengthB = 5 # mm
-    lengthC = 46.6 # mm
+    lengthC = 46.6 # mm (supposed to be 47, measured with calipers to be different)
     lengthD = 64 # mm
     lengthE = 7 # mm
     
