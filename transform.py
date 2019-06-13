@@ -6,42 +6,42 @@ import numpy as np
 import math
 
 
-# Function returns theta1 and theta2 in radians
+# Function returns theta1 and theta2 in radians, given X and Y in five-bar origin (not base origin)
 def transform(desiredX, desiredY):
 
+    GE = desiredX
+    GF = desiredY
+
     # Arm Lengths:
-    lengthA = 5 # mm
-    lengthB = 5 # mm
-    lengthC = 46.6 # mm (supposed to be 47, measured with calipers to be different)
-    lengthD = 64 # mm
-    lengthE = 7 # mm
+    ED = 5 # mm
+    AB = 5 # mm
+    DC = 47 # mm 
+    BC = 64 # mm
+    FC = 7 # mm
     
-    distBetweenActuators = 48 # mm
+    EA = 48 # mm # Distance between actuators
 
-    lengthS = math.sqrt((distBetweenActuators-desiredX)**2 + desiredY**2)
-    midAngle = np.arccos((lengthB**2 + (lengthD + lengthE)**2 - lengthS**2)/(2*lengthB*(lengthD+lengthE)))
-    angle2_mod = np.arccos((lengthB**2 + lengthS**2 - (lengthD+lengthE)**2)/(2*lengthB*lengthS))
-    angle4_mod = np.arcsin(desiredY/lengthS)
-    angle5 =  3.1416 - angle4_mod - angle2_mod
+    # Find geometry of triangle FBA
+    FA = math.sqrt((EA-GE)**2 + GF**2)
+    CBA = np.arccos((AB**2 + (BC + FC)**2 - FA**2)/(2*AB*(BC+FC)))
+    FAB = np.arccos((AB**2 + FA**2 - (BC+FC)**2)/(2*AB*FA))
+    FAE = np.arcsin(GF/FA)
+    BAH =  3.1416 - FAE - FAB
 
-    lengthR = math.sqrt(lengthD**2 + lengthB**2 - np.cos(midAngle)*2*lengthD*lengthB)
-    angle2 = np.arccos((lengthB**2 + lengthR**2 - lengthD**2)/(2*lengthB*lengthR))
-    angle4 = 3.1416 - angle5 - angle2
+    # Find geometry of triangle CBA
+    CA = math.sqrt(BC**2 + AB**2 - np.cos(CBA)*2*BC*AB)
+    BAC = np.arccos((AB**2 + CA**2 - BC**2)/(2*AB*CA))
+    CAE = 3.1416 - BAH - BAC
     
-    pivotX = distBetweenActuators - np.arccos(angle4)*lengthR
-    pivotY = np.sin(angle4)*lengthR
-    
-    # Find length Q
-    lengthQ = math.sqrt(pivotX**2 + pivotY**2)
+    # Find geometry of triangle CDE
+    KE = EA - np.arccos(CAE)*CA
+    CK = np.sin(CAE)*CA
+    EC = math.sqrt(KE**2 + CK**2)
+    DEC = np.arccos((ED**2 + EC**2 - DC**2)/(2*ED*EC))
+    CEA = np.arccos((EC**2 + EA**2 - CA**2)/(1*EC*EA))
 
-    # Find angles of subtriangles
-    angle1 = np.arccos((lengthA**2 + lengthQ**2 - lengthC**2)/(2*lengthA*lengthQ))
-    
-    angle3 = np.arcsin(pivotY/lengthQ)
-
-    theta1 = angle3 + angle1
-    theta2 = angle5
-    
+    theta1 = DEC + CEA
+    theta2 = BAH
     theta = [theta1, theta2]
 
     return theta
