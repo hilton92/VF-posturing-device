@@ -71,22 +71,17 @@ if __name__ == "__main__":
         # Stepper(pulse pin, direction pin, enable pin, steps from limit switch to home, limit switch pin, direction, step limit, home (degrees))
         StepperA  = Stepper(StepperA_PUL, StepperA_DIR, StepperA_ENA, 450, LimitA_signal, 1, 1300, 45)
         StepperB  = Stepper(StepperB_PUL, StepperB_DIR, StepperB_ENA, 400, LimitB_signal, 1, 1300, 180)
-        StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 350, LimitC_signal, 0, 1300, 180)
+        StepperC  = Stepper(StepperC_PUL, StepperC_DIR, StepperC_ENA, 320, LimitC_signal, 0, 1300, 180)
         StepperD  = Stepper(StepperD_PUL, StepperD_DIR, StepperD_ENA, 450, LimitD_signal, 0, 1300, 45)
 
 
         # Zero the Stepper Motors
+        print("Zeroing stepper motors...")
         StepperA.zero_stepper()
         StepperB.zero_stepper()
         StepperC.zero_stepper()
         StepperD.zero_stepper()
-        
-        
-        #print(StepperA.get_theta())
-        #print(StepperB.get_theta())
-        #print(StepperC.get_theta())
-        #print(StepperD.get_theta())
-        
+
         
         while True:
             try:
@@ -111,8 +106,6 @@ if __name__ == "__main__":
             theta1 = ((theta1Right / 3.1416) * 180) + 25
             theta2 = ((theta2Right / 3.1416) * 180) + 25
             
-            #print(theta1)
-            #print(theta2)
     
             # Calculate required steps for move
             stepsA = math.floor((theta2 - StepperA.get_theta()) * StepperA.stepsPerDegree)
@@ -130,21 +123,27 @@ if __name__ == "__main__":
             remainder_c = stepsC % factor
             steps_d = math.floor(stepsD / factor)
             remainder_d = stepsD % factor
-    
-
+            
+            ##########
+            
+            #CHANGE THIS VARIABLE TO MAKE THE DEVICE MOVE FASTER (doesn't affect zeroing speed)
+            delay = 0.001 # 0.0001 is the smallest this should be (smaller is faster)
+            
+            ##########
+            
             # Take steps each stepper 1 /[factor] of the way          
             for i in range(factor):
-                StepperA.take_steps(steps_a, 0.00007)
-                StepperB.take_steps(steps_b, 0.00007)
-                StepperC.take_steps(steps_c, 0.00007)
-                StepperD.take_steps(steps_d, 0.00007)
+                StepperA.take_steps(steps_a, delay)
+                StepperB.take_steps(steps_b, delay)
+                StepperC.take_steps(steps_c, delay)
+                StepperD.take_steps(steps_d, delay)
 
                 
             # make any remaining movement
-            StepperA.take_steps(remainder_a, 0.0007)
-            StepperB.take_steps(remainder_b, 0.0007)
-            StepperC.take_steps(remainder_c, 0.0007)
-            StepperD.take_steps(remainder_d, 0.0007)
+            StepperA.take_steps(remainder_a, delay)
+            StepperB.take_steps(remainder_b, delay)
+            StepperC.take_steps(remainder_c, delay)
+            StepperD.take_steps(remainder_d, delay)
             print("At X location " + str(X) + " and Y location " + str(Y))
                     
         
