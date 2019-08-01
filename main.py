@@ -8,6 +8,7 @@ import math
 import RPi.GPIO as GPIO
 from Stepper import Stepper
 from transform import transform
+import csv
 
 
 if __name__ == "__main__":
@@ -83,68 +84,44 @@ if __name__ == "__main__":
         StepperD.zero_stepper()
 
         
-        while True:
-            try:
-                val = input("Enter X and Y in the form X,Y")
-                myString = str(val)
-                [X, Y] = myString.split(",")
-            except KeyboardInterrupt:
-                break
-            except:
-                print("That wasn't right. Try again.")
-                continue
-            Y_base = float(Y) + 65
-            XBaseRight = float(X)
 
-            # Transform points from base origin to right-side origin
-            Right = np.dot(T_dINV, np.array([[XBaseRight],[Y_base],[1]]))
+        with open('points.csv') as csvfile:
+            pointsReader = csv.reader(csvfile, delimiter=',')
+            for row in pointsReader:
+                X = row[0]
+                Y = row[1]
+                Y_base = float(Y) + 65
+                XBaseRight = float(X)
 
-            # Calculate degrees of actuators for requested X and Y
-            theta1Right, theta2Right = transform(Right[0], Right[1])
+                # Transform points from base origin to right-side origin
+                Right = np.dot(T_dINV, np.array([[XBaseRight],[Y_base],[1]]))
 
-            # Convert to degrees, add 25 (transform function returns theta in right-side origin, add 25 to get in base origin)
-            theta1 = ((theta1Right / 3.1416) * 180) + 25
-            theta2 = ((theta2Right / 3.1416) * 180) + 25
-            
-    
-            # Calculate required steps for move
-            stepsA = math.floor((theta2 - StepperA.get_theta()) * StepperA.stepsPerDegree)
-            stepsB = math.floor((theta1 - StepperB.get_theta()) * StepperB.stepsPerDegree)
-            stepsC = math.floor((theta1 - StepperC.get_theta()) * StepperC.stepsPerDegree)
-            stepsD = math.floor((theta2 - StepperD.get_theta()) * StepperD.stepsPerDegree)  
-            
-            # Separate movement into [factor] separate movements
-            factor = 20
-            steps_a = math.floor(stepsA / factor)
-            remainder_a = stepsA % factor
-            steps_b = math.floor(stepsB / factor)
-            remainder_b = stepsB % factor
-            steps_c = math.floor(stepsC / factor)
-            remainder_c = stepsC % factor
-            steps_d = math.floor(stepsD / factor)
-            remainder_d = stepsD % factor
-            
-            ##########
-            
-            #CHANGE THIS VARIABLE TO MAKE THE DEVICE MOVE FASTER (doesn't affect zeroing speed)
-            delay = 0.001 # 0.0001 is the smallest this should be (smaller is faster)
-            
-            ##########
-            
-            # Take steps each stepper 1 /[factor] of the way          
-            for i in range(factor):
-                StepperA.take_steps(steps_a, delay)
-                StepperB.take_steps(steps_b, delay)
-                StepperC.take_steps(steps_c, delay)
-                StepperD.take_steps(steps_d, delay)
+                # Calculate degrees of actuators for requested X and Y
+                theta1Right, theta2Right = transform(Right[0], Right[1])
 
-                
-            # make any remaining movement
-            StepperA.take_steps(remainder_a, delay)
-            StepperB.take_steps(remainder_b, delay)
-            StepperC.take_steps(remainder_c, delay)
-            StepperD.take_steps(remainder_d, delay)
-            print("At X location " + str(X) + " and Y location " + str(Y))
+                # Convert to degrees, add 25 (transform function returns theta in right-side origin, add 25 to get in base origin)
+                theta1 = ((theta1Right / 3.1416) * 180) + 25
+                theta2 = ((theta2Right / 3.1416) * 180) + 25
+                    
+            
+                # Calculate required steps for move
+                stepsA = math.floor((theta2 - StepperA.get_theta()) * StepperA.stepsPerDegree)
+                stepsB = math.floor((theta1 - StepperB.get_theta()) * StepperB.stepsPerDegree)
+                stepsC = math.floor((theta1 - StepperC.get_theta()) * StepperC.stepsPerDegree)
+                stepsD = math.floor((theta2 - StepperD.get_theta()) * StepperD.stepsPerDegree)  
+
+                ##########
+                    
+                #CHANGE THIS VARIABLE TO MAKE THE DEVICE MOVE FASTER (doesn't affect zeroing speed)
+                delay = 0.001 # 0.0001 is the smallest this should be (smaller is faster)
+                    
+                ##########            
+
+                StepperA.take_steps(stepsA, delay)
+                StepperB.take_steps(stepsB, delay)
+                StepperC.take_steps(stepsC, delay)
+                StepperD.take_steps(stepsD, delay)
+
                     
         
         
