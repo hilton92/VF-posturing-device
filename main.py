@@ -113,7 +113,7 @@ if __name__ == "__main__":
                 ##########
                     
                 #CHANGE THIS VARIABLE TO MAKE THE DEVICE MOVE FASTER (doesn't affect zeroing speed)
-                delay = 0.001 # 0.0001 is the smallest this should be (smaller is faster)
+                delay = 0.01 # 0.0001 is the smallest this should be (smaller is faster)
                     
                 ##########            
 
